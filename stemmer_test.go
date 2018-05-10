@@ -4,10 +4,9 @@ import (
 	"testing"
 	"io/ioutil"
 	"encoding/json"
-	"path"
 )
 
-var testFile = path.Join(`..`, `tests.json`)
+var testFile = `tests.json`
 
 func TestStemWord(t *testing.T) {
 	file, err := ioutil.ReadFile(testFile)
