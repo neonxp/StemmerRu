@@ -1,6 +1,7 @@
 # Стеммер Портера для русского языка
 
 [![Build Status](https://travis-ci.org/NeonXP/StemmerRu.svg?branch=master)](https://travis-ci.org/NeonXP/StemmerRu)
+[![codecov](https://codecov.io/gh/NeonXP/StemmerRu/branch/master/graph/badge.svg)](https://codecov.io/gh/NeonXP/StemmerRu)
 
 Стемминг - процесс получения основы слова из любой его формы. Иными словами, отсекает лишние суффиксы и окончания.
 
