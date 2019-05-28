@@ -1,9 +1,9 @@
 package StemmerRu
 
 import (
-	"testing"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"testing"
 )
 
 var testFile = `tests.json`
@@ -19,7 +19,7 @@ func TestStemWord(t *testing.T) {
 		t.Error("Can't parse json", err)
 	}
 	for source, expected := range *tests {
-		result := StemWord(source);
+		result := Stem(source)
 		if expected != result {
 			t.Errorf(`Expected "%s" (source: %s) but got "%s"`, result, source, result)
 		}

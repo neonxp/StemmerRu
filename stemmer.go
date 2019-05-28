@@ -1,6 +1,7 @@
 package StemmerRu
 
 import (
+	"runtime"
 	"strings"
 )
 
@@ -17,7 +18,7 @@ var (
 	vowels = `аеиоуыэюя`
 )
 
-func StemWord(word string) string {
+func Stem(word string) string {
 
 	word = strings.Replace(word, `ё`, `е`, -1)
 
@@ -27,10 +28,9 @@ func StemWord(word string) string {
 		return word
 	}
 
-
 	R1pos := getRNPart(word, 0)
 	R2pos := getRNPart(word, R1pos)
-	if (R2pos < RVpos) {
+	if R2pos < RVpos {
 		R2pos = 0
 	} else {
 		R2pos -= RVpos
@@ -139,4 +139,56 @@ func getRNPart(word string, startPos int) int {
 	}
 
 	return startPos
+}
+
+// Code from https://github.com/caneroj1/stemmer
+
+// StemMultiple accepts a slice of strings and stems each of them.
+func StemMultiple(words []string) (output []string) {
+	output = make([]string, len(words))
+	for idx, word := range words {
+		output[idx] = Stem(word)
+	}
+
+	return
+}
+
+// StemMultipleMutate accepts a pointer to a slice of strings and stems them in place.
+// It modifies the original slice.
+func StemMultipleMutate(words *[]string) {
+	for idx, word := range *words {
+		(*words)[idx] = Stem(word)
+	}
+}
+
+// StemConcurrent accepts a pointer to a slice of strings and stems them in place.
+// It tries to offload the work into multiple threads. It makes no guarantees about
+// the order of the stems in the modified slice.
+func StemConcurrent(words *[]string) {
+	CPUs := runtime.NumCPU()
+	length := len(*words)
+	output := make(chan string)
+	partition := length / CPUs
+
+	var CPU int
+	for CPU = 0; CPU < CPUs; CPU++ {
+		go func(strs []string) {
+			for _, word := range strs {
+				output <- Stem(word)
+			}
+		}((*words)[CPU*partition : (CPU+1)*partition])
+	}
+
+	// if there are leftover words, stem them now
+	if length-(CPU)*partition > 0 {
+		go func(strs []string) {
+			for _, word := range strs {
+				output <- Stem(word)
+			}
+		}((*words)[(CPU)*partition : length])
+	}
+
+	for idx := 0; idx < length; idx++ {
+		(*words)[idx] = <-output
+	}
 }
